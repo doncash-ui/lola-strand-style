@@ -80,6 +80,11 @@
             margin-bottom: 25px;
         }
 
+        .status {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
         button {
             background: #111;
             color: white;
@@ -88,15 +93,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-        }
-
-        button:hover {
-            opacity: 0.85;
-        }
-
-        .status {
-            margin-bottom: 15px;
-            font-weight: bold;
         }
 
         @media (max-width: 700px) {
@@ -115,11 +111,9 @@
 </header>
 
 <div class="container">
-
     <div id="product-container">
         Loading product...
     </div>
-
 </div>
 
 <script>
@@ -136,57 +130,159 @@ const supabaseClient =
         SUPABASE_KEY
     );
 
-const params = new URLSearchParams(window.location.search);
-
-const productId = params.get("id");
-
 async function loadProduct() {
 
     const container =
         document.getElementById("product-container");
 
+    const params =
+        new URLSearchParams(window.location.search);
+
+    const productId =
+        params.get("id");
+
+    console.log("Product ID:", productId);
+
     if (!productId) {
         container.innerHTML =
-            "<p>Product not found.</p>";
+            "<p>Product ID is missing.</p>";
         return;
     }
 
-   const { data, error } =
-    await supabaseClient
-        .from("product")
-        .select("*")
-        .eq("id", productId);
+    try {
 
-console.log("Product ID:", productId);
-console.log("Product data:", data);
-console.log("Product error:", error);
+        const result =
+            await supabaseClient
+                .from("product")
+                .select("*")
+                .eq("id", productId)
+                .single();
 
-if (error) {
-    container.innerHTML =
-        "<p>Supabase error: " +
-        error.message +
-        "</p>";
-    return;
+        console.log("Supabase result:", result);
+
+        if (result.error) {
+
+            container.innerHTML =
+                "<p>Unable to load product.</p>" +
+                "<p style='color:red; margin-top:10px;'>" +
+                result.error.message +
+                "</p>";
+
+            return;
+        }
+
+        const product =
+            result.data;
+
+        if (!product) {
+
+            container.innerHTML =
+                "<p>Product not found.</p>";
+
+            return;
+        }
+
+        container.innerHTML = `
+
+            <div class="product">
+
+                <img
+                    src="${product.image_url || ""}"
+                    alt="${product.name}"
+                >
+
+                <div class="product-info">
+
+                    <h1>${product.name}</h1>
+
+                    <div class="price">
+                        ₦${Number(product.price).toLocaleString()}
+                    </div>
+
+                    <div class="status">
+                        ${product.in_stock
+                            ? "In Stock"
+                            : "Out of Stock"}
+                    </div>
+
+                    <p class="description">
+                        ${product.description || "No description available."}
+                    </p>
+
+                    ${
+                        product.in_stock
+                        ? `<button onclick="addToCart()">
+                            🛒 Add to Cart
+                           </button>`
+                        : `<button disabled>
+                            Out of Stock
+                           </button>`
+                    }
+
+                </div>
+
+            </div>
+
+        `;
+
+        window.currentProduct =
+            product;
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "<p>Something went wrong.</p>" +
+            "<p style='color:red;'>" +
+            error.message +
+            "</p>";
+    }
 }
 
-if (!data || data.length === 0) {
-    container.innerHTML =
-        "<p>No product found for this ID.</p>";
-    return;
+function addToCart() {
+
+    const product =
+        window.currentProduct;
+
+    let cart =
+        JSON.parse(
+            localStorage.getItem("lolaCart") || "[]"
+        );
+
+    const existing =
+        cart.find(
+            item => item.id === product.id
+        );
+
+    if (existing) {
+
+        existing.quantity += 1;
+
+    } else {
+
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image_url: product.image_url,
+            quantity: 1
+        });
+
+    }
+
+    localStorage.setItem(
+        "lolaCart",
+        JSON.stringify(cart)
+    );
+
+    alert("Product added to cart!");
+
 }
 
-const product = data[0];
+loadProduct();
 
-    if (error) {
-    console.error("Product error:", error);
+</script>
 
-    container.innerHTML =
-        "<p>Unable to load product.</p>" +
-        "<p style='color:red; margin-top:10px;'>" +
-        error.message +
-        "</p>";
-
-    return;
-}
-
-   
+</body>
+</html>
