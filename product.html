@@ -151,12 +151,31 @@ async function loadProduct() {
         return;
     }
 
-    const { data, error } =
-        await supabaseClient
-            .from("product")
-            .select("*")
-            .eq("id", productId)
-            .single();
+   const { data, error } =
+    await supabaseClient
+        .from("product")
+        .select("*")
+        .eq("id", productId);
+
+console.log("Product ID:", productId);
+console.log("Product data:", data);
+console.log("Product error:", error);
+
+if (error) {
+    container.innerHTML =
+        "<p>Supabase error: " +
+        error.message +
+        "</p>";
+    return;
+}
+
+if (!data || data.length === 0) {
+    container.innerHTML =
+        "<p>No product found for this ID.</p>";
+    return;
+}
+
+const product = data[0];
 
     if (error) {
     console.error("Product error:", error);
