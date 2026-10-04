@@ -101,42 +101,46 @@
 
         <h2>Customer Information</h2>
 
-        <form>
+        <form id="checkout-form">
 
-            <label>Full Name</label>
+    <label>Full Name</label>
 
-            <input
-                type="text"
-                placeholder="Enter your full name"
-                required
-            >
+    <input
+        id="customer-name"
+        type="text"
+        placeholder="Enter your full name"
+        required
+    >
 
-            <label>Phone Number</label>
+    <label>Phone Number</label>
 
-            <input
-                type="tel"
-                placeholder="08012345678"
-                required
-            >
+    <input
+        id="customer-phone"
+        type="tel"
+        placeholder="08012345678"
+        required
+    >
 
-            <label>Delivery Address</label>
+    <label>Delivery Address</label>
 
-            <textarea
-                placeholder="Enter your delivery address"
-                required
-            ></textarea>
+    <textarea
+        id="customer-address"
+        placeholder="Enter your delivery address"
+        required
+    ></textarea>
 
-            <label>Order Notes</label>
+    <label>Order Notes</label>
 
-            <textarea
-                placeholder="Optional"
-            ></textarea>
+    <textarea
+        id="order-notes"
+        placeholder="Optional"
+    ></textarea>
 
-            <button type="submit">
-                Place Order
-            </button>
+    <button type="submit">
+        Place Order
+    </button>
 
-        </form>
+</form>
 
     </div>
 
@@ -155,6 +159,109 @@ const supabaseClient =
         SUPABASE_URL,
         SUPABASE_KEY
     );
+    const cart =
+    JSON.parse(
+        localStorage.getItem("lolaCart") || "[]"
+    );
+
+const checkoutForm =
+    document.getElementById("checkout-form");
+
+checkoutForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        if (cart.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        const customerName =
+            document.getElementById(
+                "customer-name"
+            ).value.trim();
+
+        const customerPhone =
+            document.getElementById(
+                "customer-phone"
+            ).value.trim();
+
+        const customerAddress =
+            document.getElementById(
+                "customer-address"
+            ).value.trim();
+
+        const orderNotes =
+            document.getElementById(
+                "order-notes"
+            ).value.trim();
+
+        let totalAmount = 0;
+
+        const items = cart.map(item => {
+
+            const itemTotal =
+                Number(item.price) *
+                Number(item.quantity);
+
+            totalAmount += itemTotal;
+
+            return `${item.name} × ${item.quantity} — ₦${itemTotal.toLocaleString()}`;
+        }).join("\n");
+
+        const finalItems =
+            orderNotes
+                ? items + "\nNotes: " + orderNotes
+                : items;
+
+        const { data, error } =
+            await supabaseClient
+                .from("orders")
+                .insert([
+                    {
+                        customer_name: customerName,
+                        customer_phone: customerPhone,
+                        customer_address: customerAddress,
+                        items: finalItems,
+                        total_amount: totalAmount,
+                        status: "Pending"
+                    }
+                ])
+                .select();
+
+        if (error) {
+
+            console.error(
+                "Order error:",
+                error
+            );
+
+            alert(
+                "Order could not be placed: " +
+                error.message
+            );
+
+            return;
+        }
+
+        console.log(
+            "Order created:",
+            data
+        );
+
+        localStorage.removeItem("lolaCart");
+
+        alert(
+            "Order placed successfully!"
+        );
+
+        window.location.href =
+            "index.html";
+
+    }
+);
 
 </script>
 
