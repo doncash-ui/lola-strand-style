@@ -25,7 +25,6 @@
             padding: 18px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
         header a {
@@ -35,23 +34,22 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 700px;
             margin: 30px auto;
             padding: 20px;
-        }
-
-        h1 {
-            margin-bottom: 25px;
         }
 
         .box {
             background: white;
             padding: 25px;
             border-radius: 12px;
+        }
+
+        h1 {
             margin-bottom: 20px;
         }
 
-        .box h2 {
+        h2 {
             margin-bottom: 20px;
         }
 
@@ -65,48 +63,84 @@
         textarea {
             width: 100%;
             padding: 13px;
+            margin-bottom: 18px;
             border: 1px solid #ccc;
             border-radius: 7px;
-            margin-bottom: 18px;
             font-size: 16px;
         }
 
         textarea {
             min-height: 100px;
-            resize: vertical;
         }
 
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .total {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .place-order {
+        button {
             width: 100%;
+            padding: 15px;
             background: #111;
             color: white;
             border: none;
-            padding: 16px;
             border-radius: 8px;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
-            cursor: pointer;
         }
+    </style>
+</head>
 
-        .place-order:hover {
-            opacity: 0.85;
-        }
+<body>
 
-        .empty {
-            background: white;
-            padding: 30px;
-            border-radius:
+<header>
+    <a href="index.html">Lola Strand & Style</a>
+    <a href="cart.html">← Back to Cart</a>
+</header>
+
+<div class="container">
+
+    <h1>Checkout</h1>
+
+    <div class="box">
+
+        <h2>Customer Information</h2>
+
+        <form>
+
+            <label>Full Name</label>
+
+            <input
+                type="text"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <label>Phone Number</label>
+
+            <input
+                type="tel"
+                placeholder="08012345678"
+                required
+            >
+
+            <label>Delivery Address</label>
+
+            <textarea
+                placeholder="Enter your delivery address"
+                required
+            ></textarea>
+
+            <label>Order Notes</label>
+
+            <textarea
+                placeholder="Optional"
+            ></textarea>
+
+            <button type="submit">
+                Place Order
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
