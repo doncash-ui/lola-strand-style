@@ -215,9 +215,26 @@ try {
                         </div>
 
                         <div class="quantity">
-                            Quantity: ${item.quantity}
-                        </div>
 
+    <button
+        type="button"
+        onclick="changeQuantity(${index}, -1)"
+    >
+        −
+    </button>
+
+    <span style="margin: 0 12px;">
+        ${item.quantity}
+    </span>
+
+    <button
+        type="button"
+        onclick="changeQuantity(${index}, 1)"
+    >
+        +
+    </button>
+
+</div>
                     </div>
 
                     <button
@@ -264,7 +281,27 @@ try {
     `;
 }
 
+function changeQuantity(index, change) {
 
+    let cart =
+        JSON.parse(
+            localStorage.getItem("lolaCart") || "[]"
+        );
+
+    cart[index].quantity =
+        Number(cart[index].quantity) + change;
+
+    if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    localStorage.setItem(
+        "lolaCart",
+        JSON.stringify(cart)
+    );
+
+    location.reload();
+}
 function removeItem(index) {
 
     let cart =
