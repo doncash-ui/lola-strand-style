@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Cart - Lola Strand & Style</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -26,6 +32,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
         }
 
         header a {
@@ -46,12 +53,13 @@
 
         .cart-item {
             background: white;
-            padding: 15px;
+            padding: 18px;
             border-radius: 12px;
             margin-bottom: 15px;
+
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 18px;
         }
 
         .cart-item img {
@@ -72,10 +80,30 @@
 
         .price {
             font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        .quantity {
-            margin-top: 8px;
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-controls button {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: #111;
+            color: white;
+            border-radius: 6px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .quantity-number {
+            min-width: 25px;
+            text-align: center;
+            font-weight: bold;
         }
 
         .remove {
@@ -119,14 +147,8 @@
             text-align: center;
         }
 
-        .error {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            color: red;
-        }
-
         @media (max-width: 600px) {
+
             .cart-item {
                 align-items: flex-start;
             }
@@ -135,16 +157,31 @@
                 width: 70px;
                 height: 70px;
             }
+
+            .remove {
+                padding: 8px;
+            }
+
         }
+
     </style>
+
 </head>
 
 <body>
 
 <header>
-    <a href="index.html">Lola Strand & Style</a>
-    <a href="index.html">← Continue Shopping</a>
+
+    <a href="index.html">
+        Lola Strand & Style
+    </a>
+
+    <a href="index.html">
+        ← Continue Shopping
+    </a>
+
 </header>
+
 
 <div class="container">
 
@@ -156,175 +193,228 @@
 
 </div>
 
+
 <script>
 
-try {
+function getCart() {
+
+    return JSON.parse(
+        localStorage.getItem("lolaCart") || "[]"
+    );
+
+}
+
+
+function saveCart(cart) {
+
+    localStorage.setItem(
+        "lolaCart",
+        JSON.stringify(cart)
+    );
+
+}
+
+
+function displayCart() {
 
     const container =
         document.getElementById("cart-container");
 
-    const savedCart =
-        localStorage.getItem("lolaCart");
-
-    console.log("Saved cart:", savedCart);
-
-    const cart =
-        JSON.parse(savedCart || "[]");
+    const cart = getCart();
 
     if (!Array.isArray(cart) || cart.length === 0) {
 
         container.innerHTML = `
+
             <div class="empty">
-                <h2>Your cart is empty</h2>
+
+                <h2>
+                    Your cart is empty
+                </h2>
+
                 <p style="margin-top:10px;">
                     Add some products to your cart.
                 </p>
+
             </div>
+
         `;
 
-    } else {
-
-        let total = 0;
-        let itemsHTML = "";
-
-        cart.forEach((item, index) => {
-
-            const itemTotal =
-                Number(item.price) *
-                Number(item.quantity);
-
-            total += itemTotal;
-
-            itemsHTML += `
-
-                <div class="cart-item">
-
-                    <img
-                        src="${item.image_url || ""}"
-                        alt="${item.name || "Product"}"
-                    >
-
-                    <div class="item-info">
-
-                        <h3>
-                            ${item.name || "Product"}
-                        </h3>
-
-                        <div class="price">
-                            ₦${Number(item.price).toLocaleString()}
-                        </div>
-
-                        <div class="quantity">
-
-    <button
-        type="button"
-        onclick="changeQuantity(${index}, -1)"
-    >
-        −
-    </button>
-
-    <span style="margin: 0 12px;">
-        ${item.quantity}
-    </span>
-
-    <button
-        type="button"
-        onclick="changeQuantity(${index}, 1)"
-    >
-        +
-    </button>
-
-</div>
-                    </div>
-
-                    <button
-                        class="remove"
-                        onclick="removeItem(${index})"
-                    >
-                        Remove
-                    </button>
-
-                </div>
-
-            `;
-        });
-
-        container.innerHTML = `
-
-            ${itemsHTML}
-
-            <div class="summary">
-
-                <div class="total">
-                    Total:
-                    ₦${total.toLocaleString()}
-                </div>
-
-                <a
-    href="checkout.html"
-    class="checkout"
->
-    Proceed to Checkout
-</a>
-            </div>
-        `;
+        return;
     }
 
-} catch (error) {
 
-    console.error("Cart error:", error);
+    let total = 0;
 
-    document.getElementById("cart-container").innerHTML = `
-        <div class="error">
-            Cart error: ${error.message}
+    let itemsHTML = "";
+
+
+    cart.forEach((item, index) => {
+
+        const price =
+            Number(item.price) || 0;
+
+        const quantity =
+            Number(item.quantity) || 1;
+
+        const itemTotal =
+            price * quantity;
+
+        total += itemTotal;
+
+
+        itemsHTML += `
+
+            <div class="cart-item">
+
+                <img
+                    src="${item.image_url || ""}"
+                    alt="${item.name || "Product"}"
+                >
+
+
+                <div class="item-info">
+
+                    <h3>
+                        ${item.name || "Product"}
+                    </h3>
+
+
+                    <div class="price">
+
+                        ₦${price.toLocaleString()}
+
+                    </div>
+
+
+                    <div class="quantity-controls">
+
+                        <button
+                            type="button"
+                            onclick="changeQuantity(${index}, -1)"
+                        >
+                            −
+                        </button>
+
+
+                        <span class="quantity-number">
+                            ${quantity}
+                        </span>
+
+
+                        <button
+                            type="button"
+                            onclick="changeQuantity(${index}, 1)"
+                        >
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="remove"
+                    onclick="removeItem(${index})"
+                >
+                    Remove
+                </button>
+
+            </div>
+
+        `;
+
+    });
+
+
+    container.innerHTML = `
+
+        ${itemsHTML}
+
+
+        <div class="summary">
+
+            <div class="total">
+
+                Total:
+                ₦${total.toLocaleString()}
+
+            </div>
+
+
+            <a
+                href="checkout.html"
+                class="checkout"
+            >
+                Proceed to Checkout
+            </a>
+
         </div>
+
     `;
+
 }
+
 
 function changeQuantity(index, change) {
 
-    let cart =
-        JSON.parse(
-            localStorage.getItem("lolaCart") || "[]"
-        );
+    const cart = getCart();
 
-    cart[index].quantity =
-        Number(cart[index].quantity) + change;
 
-    if (cart[index].quantity <= 0) {
-        cart.splice(index, 1);
+    if (!cart[index]) {
+        return;
     }
 
-    localStorage.setItem(
-        "lolaCart",
-        JSON.stringify(cart)
-    );
 
-    location.reload();
+    let quantity =
+        Number(cart[index].quantity) || 1;
+
+
+    quantity += change;
+
+
+    if (quantity <= 0) {
+
+        cart.splice(index, 1);
+
+    } else {
+
+        cart[index].quantity =
+            quantity;
+
+    }
+
+
+    saveCart(cart);
+
+    displayCart();
+
 }
+
+
 function removeItem(index) {
 
-    let cart =
-        JSON.parse(
-            localStorage.getItem("lolaCart") || "[]"
-        );
+    const cart = getCart();
+
+
+    if (!cart[index]) {
+        return;
+    }
+
 
     cart.splice(index, 1);
 
-    localStorage.setItem(
-        "lolaCart",
-        JSON.stringify(cart)
-    );
 
-    location.reload();
-}
+    saveCart(cart);
 
-
-function checkout() {
-
-    alert("Checkout page coming next!");
+    displayCart();
 
 }
+
+
+displayCart();
 
 </script>
 
