@@ -159,12 +159,15 @@ async function loadProduct() {
             .single();
 
     if (error) {
-        console.error(error);
+    console.error("Product error:", error);
 
-        container.innerHTML =
-            "<p>Unable to load this product.</p>";
+    container.innerHTML =
+        "<p>Unable to load product.</p>" +
+        "<p style='color:red; margin-top:10px;'>" +
+        error.message +
+        "</p>";
 
-        return;
-    }
+    return;
+}
 
    
